@@ -1,4 +1,4 @@
-# Conversor PDF para Excel
+# PDF → Excel
 
-Este app converte PDFs de pedidos em planilhas Excel.
-Suba um arquivo PDF e baixe o resultado em Excel.
+Converta arquivos PDF de pedidos para Excel com um clique.
+Este app foi criado com Streamlit.
