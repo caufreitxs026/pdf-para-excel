@@ -83,12 +83,12 @@ def processar_pdf(uploaded_file):
     return buffer, nome
 
 st.set_page_config(page_title="Conversor de PDF para Excel", layout="centered")
-st.title("📄➡️📊 PDF de Pedido → Excel")
+st.title("PDF → Excel")
 
-uploaded_file = st.file_uploader("📥 Faça upload do PDF do pedido", type=["pdf"])
+uploaded_file = st.file_uploader("Faça upload do PDF do pedido", type=["pdf"])
 
 if uploaded_file:
-    with st.spinner("🔄 Processando PDF..."):
+    with st.spinner("Processando PDF..."):
         excel_bytes, nome_arquivo = processar_pdf(uploaded_file)
-    st.success("✅ Conversão concluída!")
-    st.download_button("📥 Baixar Excel", data=excel_bytes, file_name=nome_arquivo, mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+    st.success("Conversão concluída!")
+    st.download_button("Baixar Excel", data=excel_bytes, file_name=nome_arquivo, mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
