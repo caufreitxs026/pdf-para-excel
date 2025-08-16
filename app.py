@@ -3,9 +3,7 @@ import fitz  # PyMuPDF
 import pandas as pd
 import re
 import io
-import base64 # Usado para embutir os ícones
 
-# --- LÓGICA DE EXTRAÇÃO DE DADOS (NÃO MODIFICADA) ---
 # A mecânica de leitura e transformação do PDF para Excel permanece a mesma.
 
 def extrair_dados_pedido(texto):
@@ -49,7 +47,6 @@ def extrair_itens_pedido(texto):
     texto_itens = texto[inicio_itens:].replace("Itens do pedido", "").strip()
     itens = []
 
-    # Regex aprimorado para capturar todos os campos de um item
     padrao_produto = re.compile(
         r"([\w\s\d]+)\nSKU:\s*(\d+)\s*EAN:\s*(\d+)\s*Caixa:\s*([\d\w\s]+)\s*"
         r"Peso:\s*([\d,]+kg)\s*Qtd. Unidade:\s*(\d+)\s*Qtd. Inteira:\s*([\d\w\s]+)\s*"
@@ -90,66 +87,34 @@ def processar_pdf(uploaded_file):
     nome_arquivo = f"Pre-pedido-{pre_pedido}_Sold-{sold}.xlsx"
     return buffer, nome_arquivo
 
-# --- INTERFACE GRÁFICA (UI) APRIMORADA ---
+# --- NOVA INTERFACE GRÁFICA (UI) - TEMA ESCURO E MINIMALISTA ---
 
-# Configuração da página com um estilo mais limpo
+# Configuração da página
 st.set_page_config(
-    page_title="Conversor PDF para Excel",
-    page_icon="📄",
-    layout="centered",
-    initial_sidebar_state="collapsed"
+    page_title="PDF para Excel",
+    page_icon="✨",
+    layout="centered"
 )
 
-# Estilo CSS customizado para um visual mais moderno e minimalista
+# CSS para centralizar e estilizar o rodapé
 st.markdown("""
 <style>
-    /* Estilo geral do corpo */
-    .main {
-        background-color: #f5f5f7;
-        padding: 2rem;
-    }
-    /* Estilo do cabeçalho */
-    .title-wrapper {
+    .main-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
         text-align: center;
-        margin-bottom: 2rem;
+        padding-top: 2rem;
     }
-    .title-wrapper h1 {
-        font-size: 2.5rem;
-        color: #1d1d1f;
-        font-weight: 600;
-    }
-    .title-wrapper p {
-        font-size: 1.1rem;
-        color: #6e6e73;
-    }
-    /* Estilo do container principal */
-    .content-wrapper {
-        background-color: #ffffff;
-        padding: 2rem 2.5rem;
-        border-radius: 12px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-        text-align: center;
-    }
-    /* Estilo do botão de download */
-    div[data-testid="stDownloadButton"] > button {
-        width: 100%;
-        background-color: #007aff;
-        color: white;
-        border-radius: 8px;
-        padding: 0.75rem 0;
-        font-weight: 500;
-        border: none;
-        transition: background-color 0.2s ease;
-    }
-    div[data-testid="stDownloadButton"] > button:hover {
-        background-color: #0056b3;
-    }
-    /* Estilo do rodapé com ícones sociais */
     .footer {
         text-align: center;
-        margin-top: 3rem;
-        color: #86868b;
-        font-size: 0.9rem;
+        position: fixed;
+        left: 0;
+        bottom: 0;
+        width: 100%;
+        padding: 1rem;
+        color: #888;
     }
     .footer a {
         margin: 0 10px;
@@ -162,58 +127,47 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# --- Cabeçalho ---
-st.markdown("""
-<div class="title-wrapper">
-    <h1>Conversor de Pedidos</h1>
-    <p>Transforme seus arquivos de pedido PDF em planilhas Excel de forma rápida e fácil.</p>
-</div>
-""", unsafe_allow_html=True)
-
-
 # --- Corpo do Aplicativo ---
-st.markdown('<div class="content-wrapper">', unsafe_allow_html=True)
+st.markdown('<div class="main-container">', unsafe_allow_html=True)
 
-# Uploader de arquivo com um rótulo mais claro
+st.title("Conversor PDF → Excel")
+st.markdown("Faça o upload do arquivo de pedido para convertê-lo em uma planilha.")
+
+# Uploader de arquivo
 uploaded_file = st.file_uploader(
-    "**Arraste e solte o PDF do pedido aqui**",
+    "Selecione o arquivo PDF",
     type=["pdf"],
-    label_visibility="visible"
+    label_visibility="collapsed"
 )
 
 # Lógica de processamento e download
 if uploaded_file:
-    with st.spinner("Analisando e convertendo o documento..."):
+    with st.spinner("Processando..."):
         try:
             excel_bytes, nome_arquivo = processar_pdf(uploaded_file)
-            st.success("🎉 Arquivo Excel gerado com sucesso!")
+            st.success("Conversão concluída com sucesso!")
             st.download_button(
-                label="**Baixar Planilha Excel**",
+                label="Baixar Arquivo Excel",
                 data=excel_bytes,
                 file_name=nome_arquivo,
-                mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                use_container_width=True # Botão ocupa a largura toda
             )
         except Exception as e:
-            st.error(f"❌ Ocorreu um erro ao processar o arquivo: {e}")
-            st.warning("Por favor, verifique se o formato do PDF está correto e tente novamente.")
-
-else:
-    st.info("Aguardando o upload de um arquivo PDF para iniciar a conversão.")
+            st.error(f"Ocorreu um erro ao processar o arquivo: {e}")
 
 st.markdown('</div>', unsafe_allow_html=True)
 
 
 # --- Rodapé com Ícones Sociais ---
-# SVG dos ícones para garantir alta qualidade e não depender de links externos
-# Ícones obtidos de simpleicons.org
 github_icon_svg = """
-<svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="#6e6e73">
+<svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="#888">
 <title>GitHub</title>
 <path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/>
 </svg>
 """
 linkedin_icon_svg = """
-<svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="#6e6e73">
+<svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="#888">
 <title>LinkedIn</title>
 <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.225 0z"/>
 </svg>
@@ -226,7 +180,6 @@ linkedin_url = "https://www.linkedin.com/in/cauafreitas"
 # Renderização do rodapé
 st.markdown(f"""
 <div class="footer">
-    <p>Desenvolvido por Cauã Freitas</p>
     <a href="{github_url}" target="_blank">{github_icon_svg}</a>
     <a href="{linkedin_url}" target="_blank">{linkedin_icon_svg}</a>
 </div>
