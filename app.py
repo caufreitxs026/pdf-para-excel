@@ -92,7 +92,7 @@ def processar_pdf(uploaded_file):
 # Configuração da página
 st.set_page_config(
     page_title="PDF para Excel",
-    page_icon="✨",
+    #page_icon="✨",
     layout="centered"
 )
 
